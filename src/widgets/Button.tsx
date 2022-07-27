@@ -1,4 +1,6 @@
-export interface IButtonProps  {
+import { IRuntimeWidgetProps } from "../types/IRuntimeWidgetProps";
+
+export interface IButtonProps extends IRuntimeWidgetProps  {
     caption: string;
     fontSize: number;
     onClick: () => void;
