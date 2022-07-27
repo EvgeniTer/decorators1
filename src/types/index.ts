@@ -63,6 +63,11 @@ export interface IChangeService {
     onChangeOrder: (parentWidgetId: number, targetWidgetId:number, index:number) => void;
 }
 
+
+export interface IDragnDropService {
+    
+}
+
 //Интерфейс для выбора виджета
 export interface ISelectionService {
     /**
