@@ -1,6 +1,7 @@
 import { useContext } from "react";
+import { WASI } from "wasi";
 import { DesignTimeDecorator } from "../decorators/DesignTimeDecorator";
-import { Player } from "../player/Player";
+import { Play } from "../player/Play";  
 import { Dimension, IHierarchyWidget, JSXFunction, ViewMode, WidgetType } from "../types";
 import { IRuntimeWidgetProps } from "../types/IRuntimeWidgetProps";
 import TwoColumnsBlock from "../widgets/blocks/TwoColumnsBlock";
@@ -24,8 +25,8 @@ export function Frame(props:IFrameProps) {
         componentType: "TwoColumnsBlock",
         id: 2,
         props: {
-            height: { value: 10, unit: "px"},
-            width: { value: 10, unit: "px"},
+            height: { value: 50, unit: "px"},
+            width: { value: 400, unit: "px"},
             id: 2
         },
         children: [{
@@ -33,8 +34,8 @@ export function Frame(props:IFrameProps) {
             componentType: "Button",
             id: 1,
             props: {
-                height: { value: 10, unit: "px"},
-                width: { value: 10, unit: "px"},
+                height: { value: 20, unit: "px"},
+                width: { value: 100, unit: "px"},
                 id: 1,
                 column: 1,
                 caption: "First column button"
@@ -45,14 +46,52 @@ export function Frame(props:IFrameProps) {
             componentType: "Button",
             id: 2,
             props: {
-                height: { value: 10, unit: "px"},
-                width: { value: 10, unit: "px"},
+                height: { value: 20, unit: "px"},
+                width: { value: 100, unit: "px"},
                 id: 2,
                 column: 2,
                 caption: "Second column button"
             }
-        }]
+        },
+        {
+            component: (widgetProps:IRuntimeWidgetProps) => <TwoColumnsBlock {...widgetProps as any} />,
+            componentType: "TwoColumnsBlock",
+            id: 4,
+            props: {
+                height: { value: 20, unit: "px"},
+                width: { value: 200, unit: "px"},
+                id: 4,
+                column: 1
+            },
+            children: [{
+                component: (widgetProps:IRuntimeWidgetProps) => <Button {...widgetProps as any} />,
+                componentType: "Button",
+                id: 7,
+                props: {
+                    height: { value: 10, unit: "px"},
+                    width: { value: 50, unit: "px"},
+                    id: 7,
+                    column: 1,
+                    caption: "Inside  First column button"
+                }
+            },
+            {
+                component: (widgetProps:IRuntimeWidgetProps) => <Button {...widgetProps as any} />,
+                componentType: "Button",
+                id: 6,
+                props: {
+                    height: { value: 10, unit: "px"},
+                    width: { value: 10, unit: "px"},
+                    id: 6,
+                    column: 2,
+                    caption: "Inside Second column button"
+                }
+            }]
+        }
+        ]
     }
+
+    prepareStyleObject(widgetTree);
 
     if (props.mode === "designtime"){
         //Здесь подразумевается проход по всему дереву и оборачивание каждого виджета в компонент для designtime
@@ -61,10 +100,28 @@ export function Frame(props:IFrameProps) {
 
     //Реализуем provider для доступа к методам контекста, по хорошему в value - прокидываем реализацию всех методов для данного контекста
     return (
-        <designTimeFrameContext.Provider value={{} as any }> 
-            <Player widget={widgetTree} />
+        <designTimeFrameContext.Provider value={{} as any }>
+            {Play([widgetTree])}
         </designTimeFrameContext.Provider>
     )
 }
 
+
+function prepareStyleObject(widget:IHierarchyWidget){
+    if (widget.props.style === undefined || widget.props.style === null){
+        widget.props.style = {};
+    }
+
+    widget.props.style.width = widget.props.width.value + widget.props.width.unit;
+    widget.props.style.height = widget.props.height.value + widget.props.height.unit;
+    widget.props.style.overflow = "hidden";
+
+    if (widget.children === undefined){
+        return;
+    }
+
+    for(let childItem of widget.children){
+        prepareStyleObject(childItem);
+    }
+}
 

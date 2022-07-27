@@ -1,7 +1,7 @@
-import React from "react";
-import { IPlayerProps } from "../../player/Player";
+import React, { CSSProperties } from "react";
+import { IRuntimeWidgetProps } from "../../types/IRuntimeWidgetProps";
 
-interface ITwoColumnsBlockProps {
+interface ITwoColumnsBlockProps extends IRuntimeWidgetProps {
 
 }
 
@@ -16,10 +16,12 @@ export default function TwoColumnsBlock(props: React.PropsWithChildren<ITwoColum
     React.Children.forEach(props.children, element => {
         if (!React.isValidElement(element)) return
       
-        const childrenWidgetProp = element.props as any;
+        const childrenWidgetProp = element.props as IRuntimeWidgetProps;
+
       
         const columnIndex: number | undefined = childrenWidgetProp["column"] as any; 
-        if (columnIndex === 1){
+        if (columnIndex === 1) {
+            childrenWidgetProp.style!.color = "green";
             firstColumnsChildren.push(element);
         }
         else{
@@ -27,10 +29,15 @@ export default function TwoColumnsBlock(props: React.PropsWithChildren<ITwoColum
         }
       })
 
-      
+    const baseStyle:CSSProperties = {
+        display: "flex",
+        border: "1px solid"
+    };
     
+    const computedStyle = Object.assign({}, baseStyle, props.style);
+
     return (
-        <div style={{ display: "flex"}}>
+        <div style={computedStyle} className={props.className}>
             <div style={{ width: "50%", maxWidth: "50%" }}>
                 {firstColumnsChildren}
             </div>
